@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>User Register | CodeCraft AI</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      height: 100vh;
+      background: linear-gradient(to bottom, #000000, #1c1f2b);
+      font-family: 'Share Tech Mono', monospace;
+      color: #fff;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+
+    .floating-code {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 0;
+      overflow: hidden;
+    }
+
+    .code-snippet {
+      position: absolute;
+      font-size: 18px;
+      color: rgba(7, 247, 247, 0.774);
+      white-space: nowrap;
+      animation: float 13s linear infinite;
+    }
+
+    @keyframes float {
+      0% {
+        transform: translateY(100vh);
+        opacity: 0;
+      }
+      50% {
+        opacity: 0.8;
+      }
+      100% {
+        transform: translateY(-120vh);
+        opacity: 0;
+      }
+    }
+
+    .logo {
+      width: 100px;
+      height: 100px;
+      object-fit: contain;
+      filter: drop-shadow(0 0 15px #ffcc00) drop-shadow(0 0 20px #ff3300);
+      z-index: 10;
+    }
+
+    .typing-title {
+      font-size: 2.2rem;
+      margin-top: 15px;
+      letter-spacing: 2px;
+      color: #ffffff;
+      text-align: center;
+      z-index: 10;
+      white-space: nowrap;
+    }
+
+    .tagline {
+      font-size: 1rem;
+      margin-top: 5px;
+      background: linear-gradient(to right, #ffcc00, #ff3300);
+      background-clip: text;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      z-index: 10;
+    }
+
+    .cursor {
+      display: inline-block;
+      color: #ffcc00;
+      animation: blink 0.6s steps(1) infinite;
+    }
+
+    @keyframes blink {
+      50% { opacity: 0; }
+    }
+
+    .register-form {
+      background: rgba(0, 0, 0, 0.7);
+      padding: 30px 40px;
+      border-radius: 12px;
+      box-shadow: 0 0 25px rgba(255, 255, 255, 0.1);
+      z-index: 10;
+      margin-top: 30px;
+      width: 320px;
+    }
+
+    .register-form input {
+      width: 100%;
+      padding: 12px;
+      margin-bottom: 15px;
+      border: none;
+      border-radius: 6px;
+      background: #1f1f1f;
+      color: #fff;
+    }
+
+    .register-form button {
+      width: 100%;
+      padding: 12px;
+      background: #ff3300;
+      border: none;
+      border-radius: 6px;
+      color: #fff;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+
+    .register-form button:hover {
+      background: #cc2900;
+    }
+
+    .flash-msg {
+      color: #ff6666;
+      font-size: 0.9rem;
+      text-align: center;
+      margin-bottom: 10px;
+    }
+
+    .login-link {
+      color: #00ffff;
+      font-size: 0.85rem;
+      text-align: center;
+      margin-top: 10px;
+    }
+
+    .login-link a {
+      color: #00ffff;
+      text-decoration: none;
+    }
+
+    .login-link a:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="floating-code" id="floating-code-container"></div>
+
+  <img src="{{ url_for('static', filename='images/cc.png') }}" alt="CodeCraft AI Logo" class="logo" />
+  <h1 class="typing-title"><span id="typing"></span><span class="cursor">|</span></h1>
+  <div class="tagline">From Prompts to Projects</div>
+
+  <form method="post" class="register-form">
+    {% with messages = get_flashed_messages() %}
+      {% if messages %}
+        <div class="flash-msg">{{ messages[0] }}</div>
+      {% endif %}
+    {% endwith %}
+    <input type="text" name="username" placeholder="Username" required>
+    <input type="password" name="password" placeholder="Password" required>
+    <button type="submit">Register</button>
+    <div class="login-link">
+      Already a user? <a href="{{ url_for('user_login') }}">Log in here</a>
+    </div>
+  </form>
+
+  <script>
+    const text = "CODECRAFT AI";
+    let index = 0;
+    const typingElement = document.getElementById("typing");
+
+    function type() {
+      if (index < text.length) {
+        typingElement.innerHTML += text.charAt(index);
+        index++;
+        setTimeout(type, 90);
+      }
+    }
+
+    window.onload = () => {
+      type();
+
+      const container = document.getElementById("floating-code-container");
+      const codeSnippets = [
+        "def hello():", "print('Hello World')", "let x = 42;", "<div>AI Magic</div>",
+        "const app = express();", "response.json()", "if (error) throw error;", "import pandas as pd"
+      ];
+
+      for (let i = 0; i < 40; i++) {
+        const span = document.createElement("span");
+        span.className = "code-snippet";
+        span.textContent = codeSnippets[Math.floor(Math.random() * codeSnippets.length)];
+        span.style.top = Math.floor(Math.random() * 100) + "vh";
+        span.style.left = Math.floor(Math.random() * 100) + "vw";
+        span.style.fontSize = (12 + Math.random() * 10) + "px";
+        span.style.animationDuration = (10 + Math.random() * 10) + "s";
+        container.appendChild(span);
+      }
+    };
+  </script>
+
+</body>
+</html>

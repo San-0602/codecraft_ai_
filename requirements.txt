@@ -1,0 +1,7 @@
+Flask
+pymongo
+Flask-Bcrypt
+cohere
+python-dotenv
+fpdf
+gunicorn

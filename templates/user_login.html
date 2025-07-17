@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>CodeCraft AI - User Login</title>
+  <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      height: 100vh;
+      background: linear-gradient(to bottom, #000000, #1c1f2b);
+      overflow: hidden;
+      font-family: 'Share Tech Mono', monospace;
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+
+    .floating-code {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 0;
+      overflow: hidden;
+      pointer-events: none;
+    }
+
+    .code-snippet {
+  position: absolute;
+  font-size: 18px;
+  color: rgba(2, 252, 252, 0.479); 
+  opacity: 1;
+  white-space: nowrap;
+  animation: float 12s linear infinite;
+}
+
+    @keyframes float {
+      0% { transform: translateY(100vh); }
+      100% { transform: translateY(-120vh); }
+    }
+
+    .logo {
+      width: 100px;
+      height: 100px;
+      object-fit: contain;
+      filter: drop-shadow(0 0 15px #ffcc00) drop-shadow(0 0 20px #ff3300);
+      z-index: 10;
+    }
+
+    h1.typing-title {
+      font-size: 2.2rem;
+      margin-top: 15px;
+      letter-spacing: 2px;
+      color: #ffffff;
+      text-align: center;
+      z-index: 10;
+      white-space: nowrap;
+    }
+
+    .tagline {
+      font-size: 1rem;
+      margin-top: 5px;
+      background: linear-gradient(to right, #ffcc00, #ff3300);
+      background-clip: text;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      color: #ffcc00; /* fallback */
+      z-index: 10;
+    }
+
+    .cursor {
+      display: inline-block;
+      color: #ffcc00;
+      animation: blink 0.6s steps(1) infinite;
+    }
+
+    @keyframes blink {
+      50% { opacity: 0; }
+    }
+
+    .login-form {
+      background: rgba(0, 0, 0, 0.6);
+      padding: 30px 40px;
+      border-radius: 12px;
+      box-shadow: 0 0 20px rgba(255, 255, 255, 0.1);
+      z-index: 10;
+      margin-top: 30px;
+    }
+
+    .login-form input {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 15px;
+      border: none;
+      border-radius: 6px;
+      background: #1f1f1f;
+      color: #fff;
+    }
+
+    .login-form button {
+      width: 100%;
+      padding: 10px;
+      background: #ff3300;
+      border: none;
+      border-radius: 6px;
+      color: #fff;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+
+    .login-form button:hover {
+      background: #cc2900;
+    }
+
+    .flash-msg {
+      color: #ff6666;
+      font-size: 0.9rem;
+      text-align: center;
+      margin-bottom: 10px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Floating code -->
+  <div class="floating-code" id="floating-code-container"></div>
+
+  <!-- Logo and Branding -->
+  <img src="{{ url_for('static', filename='images/cc.png') }}" alt="CodeCraft AI Logo" class="logo" />
+  <h1 class="typing-title">
+    <span id="typing"></span><span class="cursor">|</span>
+  </h1>
+  <div class="tagline">From Prompts to Projects</div>
+
+  <!-- Login Form -->
+  <form method="post" class="login-form">
+    {% with messages = get_flashed_messages() %}
+      {% if messages %}
+        <div class="flash-msg">{{ messages[0] }}</div>
+      {% endif %}
+    {% endwith %}
+    <input type="text" name="username" placeholder="Username" required>
+    <input type="password" name="password" placeholder="Password" required>
+    <button type="submit">Login</button>
+  </form>
+
+  <!-- Typing effect -->
+  <script>
+    const text = "CODECRAFT AI";
+    let index = 0;
+    const typingElement = document.getElementById("typing");
+
+    function type() {
+      if (index < text.length) {
+        typingElement.innerHTML += text.charAt(index);
+        index++;
+        setTimeout(type, 90);
+      }
+    }
+
+    window.onload = type;
+  </script>
+
+  <!-- Floating code generator -->
+  <script>
+    const container = document.getElementById("floating-code-container");
+
+    const codeSnippets = [
+      "import numpy as np",
+      "from sklearn import model_selection",
+      "df = pd.read_csv('data.csv')",
+      "model.fit(X_train, y_train)",
+      "print('Hello, AI!')",
+      "y = model.predict(X_test)",
+      "plt.plot(x, y)",
+      "class Project: pass",
+      "requests.get(url)",
+      "torch.nn.Linear(128, 64)",
+      "input().split()",
+      "np.array([1, 2, 3])",
+      "train_test_split(X, y)",
+      "def generate_code():",
+      "json.loads(data)"
+    ];
+
+    for (let i = 0; i < 40; i++) {
+      const span = document.createElement("span");
+      span.className = "code-snippet";
+      span.textContent = codeSnippets[Math.floor(Math.random() * codeSnippets.length)];
+      span.style.top = Math.floor(Math.random() * 100) + "vh";
+      span.style.left = Math.floor(Math.random() * 100) + "vw";
+      span.style.fontSize = (14 + Math.random() * 6) + "px";
+      span.style.animationDuration = (8 + Math.random() * 10) + "s";
+      container.appendChild(span);
+    }
+  </script>
+
+</body>
+</html>

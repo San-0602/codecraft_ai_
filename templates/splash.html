@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>CodeCraft AI</title>
+  <meta http-equiv="refresh" content="5;url={{ url_for('index') }}">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      height: 100vh;
+      background: linear-gradient(135deg, #0a0a0a, #1a1a1a, #2c2c2c);
+      background-size: 300% 300%;
+      animation: bgPulse 12s ease infinite;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-family: "Segoe UI", sans-serif;
+      overflow: hidden;
+      position: relative;
+    }
+
+    @keyframes bgPulse {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    .floating-code {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    .code-line {
+      position: absolute;
+      white-space: nowrap;
+      color: #00ffcc;
+      font-family: monospace;
+      font-size: 0.9rem;
+      opacity: 0;
+      animation: floatCode 6s linear infinite;
+    }
+
+    @keyframes floatCode {
+      0% { transform: translateY(100vh); opacity: 0; }
+      10% { opacity: 0.6; }
+      50% { opacity: 1; }
+      90% { opacity: 0.4; }
+      100% { transform: translateY(-120vh); opacity: 0; }
+    }
+
+    .logo {
+      width: 180px;
+      height: 180px;
+      object-fit: contain;
+      display: block;         
+      z-index: 10;
+      filter:
+        drop-shadow(0 0 15px #ffcc00)
+        drop-shadow(0 0 30px #ff3300)
+        drop-shadow(0 0 40px rgba(255, 51, 0, 0.9));
+      animation: arcGlow 2.5s ease-in-out infinite;
+    }
+
+    @keyframes arcGlow {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.04); }
+      100% { transform: scale(1); }
+    }
+
+   .tagline {
+  font-size: 1.6rem;
+  font-weight: 500;
+  text-align: center;
+  letter-spacing: 1px;
+  background: linear-gradient(to right, #ffcc00, #ff3300);
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+  opacity: 0.95;
+  z-index: 10;
+  margin-top: 20px;
+}
+
+    .cursor {
+      display: inline-block;
+      color: #ffcc00;
+      animation: blink 0.6s steps(1) infinite;
+    }
+
+    @keyframes blink {
+      50% { opacity: 0; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Floating code animation background -->
+  <div class="floating-code" id="code-background"></div>
+
+  <div style="z-index: 10; display: flex; flex-direction: column; align-items: center;">
+    <img src="/static/images/cc.png" alt="CodeCraft AI Logo" class="logo">
+    <div class="tagline">
+      <span id="typing"></span><span class="cursor">|</span>
+    </div>
+  </div>
+
+  <script>
+    const text = "From Prompts to Projects";
+    let index = 0;
+    const typingElement = document.getElementById("typing");
+
+    function type() {
+      if (index < text.length) {
+        typingElement.innerHTML += text.charAt(index);
+        index++;
+        setTimeout(type, 85);
+      }
+    }
+
+    // Floating Code Generator
+    const codeSnippets = [
+      "def generate_code():", "for i in range(10):", "console.log('Hello')", 
+      "print('AI Project')", "function runAI()", "let project = {}",
+      "if user_input:", "class CodeCraft:", "const express = require('express')"
+    ];
+
+    function createCodeLine() {
+      const div = document.createElement("div");
+      div.className = "code-line";
+      div.textContent = codeSnippets[Math.floor(Math.random() * codeSnippets.length)];
+      div.style.left = Math.random() * 90 + "vw";
+      div.style.top = Math.random() * 100 + "vh";
+      div.style.animationDuration = (4 + Math.random() * 4) + "s";
+      document.getElementById("code-background").appendChild(div);
+      setTimeout(() => div.remove(), 8000);
+    }
+
+    window.onload = () => {
+      setTimeout(type, 200);
+      setInterval(createCodeLine, 300);
+      setTimeout(() => {
+        window.location.href = "{{ url_for('index') }}";
+      }, 4000);
+    };
+  </script>
+
+</body>
+</html>

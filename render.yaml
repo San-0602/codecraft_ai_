@@ -1,0 +1,10 @@
+services:
+  - type: web
+    name: codecraft_flask
+    env: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn app:app --timeout 120
+    envVars:
+      - key: MONGO_URI
+
+        value: mongodb+srv://sandhi0206:Z6sl4dOpWA4DaPk1@cluster0.lz4xwae.mongodb.net/?retryWrites=true&w=majority&tlsAllowInvalidCertificates=true

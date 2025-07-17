@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>CodeCraft AI</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Share Tech Mono', monospace;
+      background: #0d0d0d;
+      color: #00ffe7;
+      overflow-y: auto;
+      position: relative;
+      min-height: 100vh;
+    }
+
+    #progress-bar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 0;
+      height: 4px;
+      background: linear-gradient(90deg, #f5af19, #ff002b);
+      z-index: 9999;
+      display: none;
+      transition: width 0.3s ease-in-out;
+    }
+
+    canvas#bg {
+      position: fixed;
+      top: 0;
+      left: 0;
+      z-index: -1;
+      width: 100%;
+      height: 100%;
+    }
+
+    .ai-buddy-chat {
+      position: fixed;
+      bottom: 90px;
+      right: 20px;
+      background: #111;
+      color: #00ffe7;
+      border: 1px solid #1ecbe1;
+      border-radius: 12px;
+      width: 300px;
+      max-height: 400px;
+      overflow-y: auto;
+      box-shadow: 0 0 20px #1ecbe1;
+      z-index: 10000;
+      display: none;
+      flex-direction: column;
+    }
+
+    .ai-buddy-header {
+      background: linear-gradient(90deg, #f5af19, #ff002b);
+      padding: 12px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .ai-buddy-body {
+      padding: 10px;
+      font-size: 0.9rem;
+    }
+
+    .ai-buddy-toggle {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: #00ffe7;
+      border: none;
+      border-radius: 50%;
+      width: 50px;
+      height: 50px;
+      font-size: 24px;
+      cursor: pointer;
+      z-index: 10001;
+      box-shadow: 0 0 10px #00ffe7;
+    }
+
+    .center-container {
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+      align-items: center;
+      padding: 40px 20px;
+      min-height: 100vh;
+    }
+
+    .logo-title {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      margin-bottom: 10px;
+    }
+
+    .logo-title img {
+      height: 60px;
+      width: 60px;
+      border-radius: 50%;
+      object-fit: contain;
+      filter: drop-shadow(0 0 10px #f5af19) drop-shadow(0 0 20px #ff002b);
+    }
+
+    .typing-title {
+      font-size: 2.4rem;
+      color: #00f7ff;
+      text-shadow: 0 0 10px #00f7ff;
+      white-space: nowrap;
+      overflow: hidden;
+      border-right: 3px solid #00f7ff;
+      width: 0;
+      animation: typing 2.5s steps(13, end) forwards, blink 0.8s step-end infinite;
+    }
+
+    @keyframes typing {
+      from { width: 0; }
+      to { width: 13ch; } 
+    }
+
+    @keyframes blink {
+      50% { border-color: transparent; }
+    }
+
+    .tagline {
+      font-size: 1.2rem;
+      margin: 8px 0 30px;
+      background: linear-gradient(to right, #f5af19, #ff002b);
+      background-clip: text;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      font-weight: 600;
+      text-align: center;
+    }
+
+    .form-container, .output-container {
+      width: 100%;
+      max-width: 900px;
+      margin: 20px 0;
+      padding: 30px;
+      border-radius: 12px;
+      border: 1px solid #1ecbe1;
+      background: rgba(0, 0, 0, 0.7);
+      box-shadow: 0 0 20px #1ecbe1;
+    }
+
+    label {
+      display: block;
+      margin: 10px 0 5px;
+      font-weight: bold;
+    }
+
+    select, input[type="text"] {
+      width: 100%;
+      padding: 12px;
+      margin-bottom: 10px;
+      border-radius: 8px;
+      background: #111;
+      color: #00f7ff;
+      border: 1px solid rgba(30, 203, 225, 0.3);
+    }
+
+    button {
+      width: 100%;
+      padding: 12px;
+      border: none;
+      background: linear-gradient(135deg, #f5af19, #ff002b);
+      color: #fff;
+      border-radius: 8px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    button, .download-btn {
+  transition: all 0.3s ease;
+}
+
+button:hover, .download-btn:hover {
+  background: linear-gradient(135deg, #ff002b, #f5af19);
+  box-shadow: 0 0 15px #ff002b, 0 0 30px #f5af19;
+  transform: scale(1.05);
+  color: #fff;
+}
+    .download-btn {
+      display: inline-block;
+      margin-top: 16px;
+      padding: 10px 20px;
+      background: #1ecbe1;
+      color: black;
+      border-radius: 6px;
+      text-decoration: none;
+      font-weight: bold;
+    }
+
+    .output-container pre {
+      background-color: #0d0d0d;
+      color: #00ffcc;
+      padding: 18px;
+      border-radius: 8px;
+      overflow-x: auto;
+      border: 1px solid rgba(0, 255, 231, 0.2);
+    }
+  </style>
+</head>
+<body>
+<div id="progress-bar"></div>
+<canvas id="bg"></canvas>
+<div class="center-container">
+  <div class="logo-title">
+    <img src="{{ url_for('static', filename='images/cc.png') }}" alt="Logo" />
+    <h1 class="typing-title">CODECRAFT AI</h1>
+  </div>
+  <div class="tagline">From Prompt to Project — Built for Final Year Warriors</div>
+
+  <form class="form-container" method="POST">
+    <label for="project_type">Choose Project Type:</label>
+    <select name="project_type" id="project_type">
+      <option>Web App</option>
+      <option>Android App</option>
+      <option>ML</option>
+      <option>CLI Tool</option>
+    </select>
+
+    <label for="difficulty">Difficulty Level:</label>
+    <select name="difficulty" id="difficulty">
+      <option>Beginner</option>
+      <option>Intermediate</option>
+      <option>Advanced</option>
+    </select>
+
+    <label for="language">Programming Language:</label>
+    <select name="language" id="language">
+      <option>Python</option>
+      <option>JavaScript</option>
+      <option>Java</option>
+      <option>C++</option>
+    </select>
+
+    <label for="topic">Describe your project idea:</label>
+    <input type="text" name="topic" id="topic" required />
+
+    <button type="submit" name="action" value="generate">⚡ Generate Project</button>
+  </form>
+
+   {% if code %}
+  <div class="output-container">
+    <h2>Generated Code:</h2>
+    <pre>{{ code }}</pre>
+
+    <form method="POST">
+      <input type="hidden" name="action" value="explain">
+      <button type="submit">🧠 Explain Code</button>
+    </form>
+
+    {% if explanation %}
+    <h2>Explanation:</h2>
+    <pre>{{ explanation }}</pre>
+    {% endif %}
+
+    <form method="POST" style="margin-top: 20px;">
+      <input type="hidden" name="action" value="ask">
+      <label for="user_question">🤖 Ask CodeCraft Buddy:</label>
+      <input type="text" name="user_question" id="user_question" placeholder="Ask about the code..." required />
+      <button type="submit">Send</button>
+    </form>
+
+    {% if history %}
+    <div style="margin-top: 30px;">
+      <h3>🗣️ Conversation with CodeCraft Buddy</h3>
+      {% for q, a in history %}
+        <p><strong>You:</strong> {{ q }}</p>
+        <pre>{{ a | safe }}</pre>
+      {% endfor %}
+    </div>
+    {% endif %}
+
+    <a class="download-btn" href="{{ url_for('download') }}">📥 Download Project PDF</a>
+  </div>
+  {% endif %}
+</div>
+
+<script>
+  const canvas = document.getElementById('bg');
+  const ctx = canvas.getContext('2d');
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+  let dots = [];
+  for (let i = 0; i < 45; i++) {
+    dots.push({ x: Math.random() * canvas.width, y: Math.random() * canvas.height, vx: (Math.random() - 0.5) * 0.3, vy: (Math.random() - 0.5) * 0.3, r: 1 + Math.random() });
+  }
+  function draw() {
+    ctx.fillStyle = 'rgba(13, 13, 13, 0.1)';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    dots.forEach(dot => {
+      dot.x += dot.vx;
+      dot.y += dot.vy;
+      if (dot.x < 0 || dot.x > canvas.width) dot.vx *= -1;
+      if (dot.y < 0 || dot.y > canvas.height) dot.vy *= -1;
+      ctx.beginPath();
+      ctx.arc(dot.x, dot.y, dot.r, 0, Math.PI * 2);
+      ctx.fillStyle = "#00ffee";
+      ctx.fill();
+    });
+    requestAnimationFrame(draw);
+  }
+  draw();
+  window.addEventListener('resize', () => {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+  });
+
+  // AI Buddy and progress
+  const toggleBtn = document.createElement('button');
+  toggleBtn.innerHTML = '🤖';
+  toggleBtn.className = 'ai-buddy-toggle';
+  document.body.appendChild(toggleBtn);
+
+  const chatBox = document.createElement('div');
+  chatBox.className = 'ai-buddy-chat';
+  chatBox.innerHTML = `
+    <div class="ai-buddy-header">CodeCraft Buddy</div>
+    <div class="ai-buddy-body">
+      👋 Hi! I can explain, debug or enhance your project.<br><br>
+      Shoot your queries after generation!
+    </div>`;
+  document.body.appendChild(chatBox);
+
+  toggleBtn.addEventListener('click', () => {
+    chatBox.style.display = chatBox.style.display === 'flex' ? 'none' : 'flex';
+  });
+
+  function startProgress() {
+    const bar = document.getElementById('progress-bar');
+    bar.style.display = 'block';
+    bar.style.width = '0%';
+    let width = 0;
+    const progress = setInterval(() => {
+      if (width >= 100) {
+        clearInterval(progress);
+        bar.style.display = 'none';
+      } else {
+        width += 1.5;
+        bar.style.width = width + '%';
+      }
+    }, 25);
+  }
+</script>
+</body>
+</html>
